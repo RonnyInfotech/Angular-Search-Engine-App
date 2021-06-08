@@ -10,7 +10,7 @@ const routes: Routes = [
   { path: '', component: LoginComponent, pathMatch: 'full' },
   { path: 'signup', component: SignupComponent },
   { path: 'dashboard', component: DashboardComponent },
-  { path: 'forgot-password', component: ForgotPasswordComponent },
+  { path: 'forgotPassword', component: ForgotPasswordComponent },
   { path: '**', component: LoginComponent }
 
 ];
