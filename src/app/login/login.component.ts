@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AuthService } from './../shared/services/auth.service'
+import { Router, Params } from '@angular/router';
 declare var $: any;
 
 @Component({
@@ -8,25 +11,31 @@ declare var $: any;
 })
 export class LoginComponent implements OnInit {
 
-  constructor() { }
+  signIn: FormGroup;
+  errorMessage: string = '';
+  constructor(
+    private fb: FormBuilder,
+    public authService: AuthService,
+    private router: Router
+  ) {
+    this.signIn = this.fb.group({
+      email: ['', Validators.required],
+      password: ['', Validators.required]
+    });
+  }
 
   ngOnInit(): void {
-    // Focus input
     $('.input100').each(function () {
       $(this).on('blur', function () {
         if ($(this).val().trim() != "") {
           $(this).addClass('has-val');
-        }
-        else {
+        } else {
           $(this).removeClass('has-val');
         }
       })
     })
-
-
     // Validate
     var input = $('.validate-input .input100');
-
     $('.validate-form').on('submit', function () {
       var check = true;
 
@@ -38,8 +47,6 @@ export class LoginComponent implements OnInit {
       }
       return check;
     });
-
-
     $('.validate-form .input100').each(function () {
       $(this).focus(function () {
         hideValidate(this);
@@ -51,8 +58,7 @@ export class LoginComponent implements OnInit {
         if ($(input).val().trim().match(/^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{1,5}|[0-9]{1,3})(\]?)$/) == null) {
           return false;
         }
-      }
-      else {
+      } else {
         if ($(input).val().trim() == '') {
           return false;
         }
@@ -68,7 +74,6 @@ export class LoginComponent implements OnInit {
       var thisAlert = $(input).parent();
       $(thisAlert).removeClass('alert-validate');
     }
-
     // Show pass
     var showPass = 0;
     $('.btn-show-pass').on('click', function () {
@@ -77,8 +82,7 @@ export class LoginComponent implements OnInit {
         $(this).find('i').removeClass('zmdi-eye');
         $(this).find('i').addClass('zmdi-eye-off');
         showPass = 1;
-      }
-      else {
+      } else {
         $(this).next('input').attr('type', 'password');
         $(this).find('i').addClass('zmdi-eye');
         $(this).find('i').removeClass('zmdi-eye-off');
@@ -87,4 +91,13 @@ export class LoginComponent implements OnInit {
     });
   }
 
+  login(value) {
+    this.authService.doLogin(value)
+      .then(res => {
+        this.router.navigate(['/dashboard']);
+      }, err => {
+        console.log(err);
+        this.errorMessage = err.message;
+      })
+  }
 }
